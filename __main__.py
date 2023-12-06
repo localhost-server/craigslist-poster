@@ -6,8 +6,8 @@
 # End dev: 10/17/2015 1:45am
 
 import sys, argparse, string, ctypes, os, re
-import urllib, urllib2, cookielib, httplib
-import cookielib, time, base64
+import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse, http.cookiejar, http.client
+import http.cookiejar, time, base64
 
 from os import path
 from bs4 import BeautifulSoup
@@ -25,7 +25,7 @@ import spintax
 
 class craigslistBot:
     def debug(self, inString):
-        print (" [LOG] {BOT} - %s" % inString.encode('utf-8').strip())
+        print((" [LOG] {BOT} - %s" % inString.encode('utf-8').strip()))
 
     def __init__(self, loginEmail = "", loginPass = "", contactNumber = "", contactName = "", postTitle = "", postCode = "", postContentFile = "", waitTime = 10):
         self.display = ""
@@ -56,10 +56,13 @@ class craigslistBot:
         self.debug("Navigating to craigslist login")
         self.client.get("https://accounts.craigslist.org/login")
         self.debug("Logging in")
-        self.client.find_element_by_css_selector("#inputEmailHandle").send_keys(self.loginEmail)
-        self.client.find_element_by_css_selector("#inputPassword").send_keys(self.loginPass)
-        self.client.find_element_by_css_selector("form[name='login'] .loginBox button").click()
-
+        # self.client.find_element(By.CSS_SELECTOR,"#inputEmailHandle").send_keys(self.loginEmail)
+        # self.client.find_element(By.CSS_SELECTOR,"#inputPassword").send_keys(self.loginPass)
+        # self.client.find_element(By.CSS_SELECTOR,"form[name='login'] .loginBox button").click()
+        self.client.find_element(By.NAME, "inputEmailHandle").send_keys(self.loginEmail)
+        self.client.find_element(By.NAME, "inputPassword").send_keys(self.loginPass)
+        self.client.find_element(By.CLASS_NAME, "accountform-btn").click()
+        
         try:
             self.client.find_element_by_css_selector('.tab')
         except NoSuchElementException:
@@ -73,78 +76,75 @@ class craigslistBot:
             return 0
 
         self.debug("Navigating to post page")
-        self.client.get("http://losangeles.craigslist.org/search/sgv/cps")
-        self.client.find_element_by_css_selector(".post a.no-mobile").click()
+        self.client.get("https://orlando.craigslist.org/search/fua")
+        self.client.find_element(By.CLASS_NAME,"cl-goto-post").click()
         time.sleep(self.waitTime)
-        self.client.find_element_by_css_selector("input[value='so']").click()
+        self.client.find_elements(By.CLASS_NAME,"start-of-grouping")[1].click()
         time.sleep(self.waitTime)
-        self.client.find_element_by_css_selector("input[value='76']").click()
+        self.client.find_element(By.XPATH,'//input[@type="radio" and @value="141"]').click()
         time.sleep(self.waitTime)
-        self.client.find_element_by_css_selector("input[value='4']").click()
-        time.sleep(self.waitTime)
-
-        self.debug("Trying to fill in email")
-        try:
-            self.client.find_element_by_css_selector('#FromEMail').send_keys(self.loginEmail)
-        except NoSuchElementException:
-            self.debug("Not avaliable")
-        try:
-            self.client.find_element_by_css_selector('#FromEMail').send_keys(self.loginEmail)
-        except NoSuchElementException:
-            self.debug("Not avaliable")
-
         self.debug("Checking 'Okay to contact by phone'")
-        self.client.find_element_by_css_selector("#contact_phone_ok").click()
+        self.client.find_element(By.CSS_SELECTOR,".show_phone_ok").click()
+        time.sleep(self.waitTime)
+        self.client.find_element(By.CSS_SELECTOR,".contact_phone_ok").click()
         time.sleep(self.waitTime)
         self.debug("Checking 'Okay to contact by text'")
-        self.client.find_element_by_css_selector("#contact_text_ok").click()
+        self.client.find_element(By.CSS_SELECTOR,".contact_text_ok").click()
         time.sleep(self.waitTime)
         self.debug("Filling in contact phone number")
-        self.client.find_element_by_css_selector("#contact_phone").send_keys(self.contactNumber)
+        self.client.find_element(By.NAME,"contact_phone").send_keys(self.contactNumber)
         time.sleep(self.waitTime)
         self.debug("Filling in contact name")
-        self.client.find_element_by_css_selector("#contact_name").send_keys(self.contactName)
+        self.client.find_element(By.NAME,"contact_name").send_keys(self.contactName)
         time.sleep(self.waitTime)
         self.debug("Filling in post title")
-        self.client.find_element_by_css_selector("#PostingTitle").send_keys(spintax.parse(self.postTitle))
+        self.client.find_element(By.NAME,"PostingTitle").send_keys(spintax.parse(self.postTitle))
         time.sleep(self.waitTime)
         self.debug("Filling in zip code")
-        self.client.find_element_by_css_selector("#postal_code").send_keys(self.postCode)
+        self.client.find_element(By.ID,"postal_code").send_keys(self.postCode)
         time.sleep(self.waitTime)
-
         self.debug("Getting post content")
-        f = open(self.postContent, "rb")
+        f = open(self.postContent, "r")
         content = f.read()
         f.close()
 
-        self.debug("Spinning content")
-        spinContent = spintax.parse(content)
-
         self.debug("Filling in post content")
-        self.client.find_element_by_css_selector("#PostingBody").send_keys(spinContent)
+        self.client.find_element(By.NAME,"PostingBody").send_keys(content)
         time.sleep(self.waitTime)
+        dropdown_menu = self.client.find_element(By.ID, 'ui-id-1-button')
+        dropdown_menu.click()
+        wait = WebDriverWait(self.client, 10)
+        option_excellent = wait.until(EC.visibility_of_element_located((By.XPATH, '//li[text()="excellent"]'))).click()
+
         self.debug("Checking 'Okay to contact for other offers'")
-        self.client.find_element_by_css_selector("#oc").click()
+        self.client.find_element(By.CLASS_NAME,"contact_ok").click()
         time.sleep(self.waitTime)
-        self.debug("Unchecking 'Want a map' if checked")
-        try:
-            self.client.find_element_by_css_selector("#wantamap:checked")
-        except NoSuchElementException:
-            self.debug("Not checked")
-        finally:
-            self.client.find_element_by_css_selector("#wantamap:checked").click()
+
         time.sleep(self.waitTime)
         self.debug("Clicking continue")
-        self.client.find_element_by_css_selector('button[value="Continue"]').click()
+        self.client.find_element(By.CLASS_NAME,'submit-button').click()
         time.sleep(self.waitTime)
-        if "editimage" in self.client.current_url:
-            self.debug("Clicking continue")
-            self.client.find_element_by_css_selector('button.done').click()
+        self.client.find_element(By.CLASS_NAME,'continue').click()
+        self.client.find_element(By.CLASS_NAME,"medium-pickbutton").click()
+        self.client.find_elements(By.TAG_NAME,"label")[0].click()
         time.sleep(self.waitTime)
-        self.debug("Clicking publish")
-        self.client.find_element_by_css_selector('.draft_warning button[value="Continue"]').click()
-        time.sleep(10)
 
+
+        self.client.find_elements(By.CLASS_NAME,"start-of-grouping")[1].click()
+        self.client.find_element(By.CLASS_NAME,"pickbutton").click()
+        time.sleep(self.waitTime)
+        self.client.find_element(By.XPATH,'//input[@type="radio" and @value="141"]').click()
+        time.sleep(self.waitTime)
+        self.debug("Clicking continue")
+        self.client.find_element(By.CLASS_NAME,'submit-button').click()
+        time.sleep(self.waitTime)
+        self.client.find_element(By.CLASS_NAME,'continue').click()
+
+        self.client.find_element(By.CLASS_NAME,"bigbutton").click()
+        self.debug("Clicking publish")
+        self.client.find_element(By.CLASS_NAME,'bigbutton').click()
+        time.sleep(10)
+        
 def main(loginEmail,loginPass,contactNumber,contactName,postTitle,postCode,postContentFile,waitTime):
     startExecTime = time.time()
 
@@ -172,3 +172,13 @@ main(args.loginEmail,args.loginPass,args.contactNumber,args.contactName,args.pos
 
 # Test Execution
 # python {{SCRIPTNAME}} "example@example.com" "password" "123-456-7890" "Bob" "Post Title" "12345" "content.txt" 3
+# ENV CONTAINERIZED="True"
+# ENV LOGINEMAIL="PGTutoring1@proton.me"
+# ENV LOGINPASS="Exponentialm0ng00se!!"
+# ENV CONTACTNUM="123-456-7890"
+# ENV CONTACTNAME="Bob"
+# ENV POSTTITLE="Post Title101"
+# ENV POSTCODE="98104"
+# ENV POSTCONTENT="/app/content.txt"
+# ENV WAITTIME=4
+# ENV SE_OFFLINE false
