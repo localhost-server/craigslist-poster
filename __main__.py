@@ -5,6 +5,9 @@
 # Start dev: 10/16/2015 11:38pm
 # End dev: 10/17/2015 1:45am
 
+# from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+# from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
+# from selenium.webdriver.common.action_chains import ActionChains
 import sys, argparse, string, ctypes, os, re
 import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse, http.cookiejar, http.client
 import http.cookiejar, time, base64
@@ -12,10 +15,7 @@ import http.cookiejar, time, base64
 from os import path
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
-from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -158,27 +158,30 @@ def main(loginEmail,loginPass,contactNumber,contactName,postTitle,postCode,postC
 
     return 0
 
-parser = argparse.ArgumentParser(description="Craigslist Poster Script")
-parser.add_argument('loginEmail',metavar='LOGINEMAIL',type=str,help='Email to use for login')
-parser.add_argument('loginPass',metavar='LOGINPASS',type=str,help='Password to use for login')
-parser.add_argument('contactNumber',metavar='CONTACTNUM',type=str,help='Contact number for post')
-parser.add_argument('contactName',metavar='CONTACTNAME',type=str,help='Contact name for post')
-parser.add_argument('postTitle', metavar='POSTTITLE', type=str, help='Title of the post to be made')
-parser.add_argument('postCode',metavar='POSTCODE',type=str,help='Zip code for post')
-parser.add_argument('postContent',metavar='POSTCONTENT',type=str, help='Path to file for post content')
-parser.add_argument('waitTime',metavar='WAITTIME',type=int,help='Time to wait in between actions (Recommend 3)')
-args = parser.parse_args()
-main(args.loginEmail,args.loginPass,args.contactNumber,args.contactName,args.postTitle,args.postCode,args.postContent,args.waitTime)
 
-# Test Execution
-# python {{SCRIPTNAME}} "example@example.com" "password" "123-456-7890" "Bob" "Post Title" "12345" "content.txt" 3
-# ENV CONTAINERIZED="True"
-# ENV LOGINEMAIL="PGTutoring1@proton.me"
-# ENV LOGINPASS="Exponentialm0ng00se!!"
-# ENV CONTACTNUM="123-456-7890"
-# ENV CONTACTNAME="Bob"
-# ENV POSTTITLE="Post Title101"
-# ENV POSTCODE="98104"
-# ENV POSTCONTENT="/app/content.txt"
-# ENV WAITTIME=4
-# ENV SE_OFFLINE false
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Craigslist Poster Script")
+    parser.add_argument('loginEmail',metavar='LOGINEMAIL',type=str,help='Email to use for login')
+    parser.add_argument('loginPass',metavar='LOGINPASS',type=str,help='Password to use for login')
+    parser.add_argument('contactNumber',metavar='CONTACTNUM',type=str,help='Contact number for post')
+    parser.add_argument('contactName',metavar='CONTACTNAME',type=str,help='Contact name for post')
+    parser.add_argument('postTitle', metavar='POSTTITLE', type=str, help='Title of the post to be made')
+    parser.add_argument('postCode',metavar='POSTCODE',type=str,help='Zip code for post')
+    parser.add_argument('postContent',metavar='POSTCONTENT',type=str, help='Path to file for post content')
+    parser.add_argument('waitTime',metavar='WAITTIME',type=int,help='Time to wait in between actions (Recommend 3)')
+    args = parser.parse_args()
+    main(args.loginEmail,args.loginPass,args.contactNumber,args.contactName,args.postTitle,args.postCode,args.postContent,args.waitTime)
+
+    # Test Execution
+    # python {{SCRIPTNAME}} "example@example.com" "password" "123-456-7890" "Bob" "Post Title" "12345" "content.txt" 3
+    # ENV CONTAINERIZED="True"
+    # ENV LOGINEMAIL="PGTutoring1@proton.me"
+    # ENV LOGINPASS="Exponentialm0ng00se!!"
+    # ENV CONTACTNUM="123-456-7890"
+    # ENV CONTACTNAME="Bob"
+    # ENV POSTTITLE="Post Title101"
+    # ENV POSTCODE="98104"
+    # ENV POSTCONTENT="/app/content.txt"
+    # ENV WAITTIME=4
+    # ENV SE_OFFLINE false
+        
