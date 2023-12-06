@@ -12,6 +12,7 @@ import http.cookiejar, time, base64
 from os import path
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
 from selenium.webdriver.common.action_chains import ActionChains
@@ -34,7 +35,9 @@ class craigslistBot:
             self.display = Display(visible=0,size=(800,600))
             self.display.start()
 
-        self.client        = webdriver.Firefox()
+        self.options=Options()
+        self.options.add_argument("--headless")
+        self.client        = webdriver.Firefox(options=self.options)
         self.isLoggedIn    = False
         self.loginEmail    = loginEmail
         self.loginPass     = loginPass
