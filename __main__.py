@@ -25,7 +25,7 @@ import spintax
 
 class craigslistBot:
     def debug(self, inString):
-        print((" [LOG] {BOT} - %s" % inString.encode('utf-8').strip()))
+        print((" [LOG] {BOT} - %s" % inString.encode('utf-8').strip()),flush=True)
 
     def __init__(self, loginEmail = "", loginPass = "", contactNumber = "", contactName = "", postTitle = "", postCode = "", postContentFile = "", waitTime = 10):
         self.display = ""
@@ -56,15 +56,12 @@ class craigslistBot:
         self.debug("Navigating to craigslist login")
         self.client.get("https://accounts.craigslist.org/login")
         self.debug("Logging in")
-        # self.client.find_element(By.CSS_SELECTOR,"#inputEmailHandle").send_keys(self.loginEmail)
-        # self.client.find_element(By.CSS_SELECTOR,"#inputPassword").send_keys(self.loginPass)
-        # self.client.find_element(By.CSS_SELECTOR,"form[name='login'] .loginBox button").click()
         self.client.find_element(By.NAME, "inputEmailHandle").send_keys(self.loginEmail)
         self.client.find_element(By.NAME, "inputPassword").send_keys(self.loginPass)
         self.client.find_element(By.CLASS_NAME, "accountform-btn").click()
-        
+
         try:
-            self.client.find_element_by_css_selector('.tab')
+            self.client.find_element(By.CSS_SELECTOR,'.tab')
         except NoSuchElementException:
             self.debug("Not logged in")
             return
@@ -154,7 +151,7 @@ def main(loginEmail,loginPass,contactNumber,contactName,postTitle,postCode,postC
     endExecTime = time.time()
     clBot.debug("Execution time: %s seconds" % int(endExecTime - startExecTime))
 
-    print("Finished")
+    print("Finished",flush=True)
 
     return 0
 
