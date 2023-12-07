@@ -28,8 +28,7 @@ python /craigslist-poster/__main__.py "example@demo.com" "password" "123-456-789
 * FireFox (Should be included with Selenium)
 * PyVirtualDisplay (**pip install pyvirtualdisplay**)
 * Spintax (**pip install spintax**)
-* Python 2.7
-
+* Python 3.10
 ### Contribution guidelines ###
 
 * All code will be reviewed and approved by repository owner.
